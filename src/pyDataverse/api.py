@@ -140,7 +140,7 @@ class Api:
                 "ERROR: GET - Could not establish connection to api {0}.".format(url)
             )
 
-    def post_request(self, url, data=None, auth=False, params=None, files=None):
+    def post_request(self, url, data=None, auth=False, params=None, files=None, contentType=None):
         """Make a POST request.
 
         params will be added as key-value pairs to the URL.
@@ -170,8 +170,13 @@ class Api:
         if self.api_token:
             params["key"] = self.api_token
 
+        if contentType:
+                kwargs = {"headers": {"content-type": header}}
+        else:
+                kwargs = {}
+
         try:
-            resp = post(url, data=data, params=params, files=files)
+            resp = post(url, data=data, params=params, files=files, **kwargs)
             if resp.status_code == 401:
                 error_msg = resp.json()["message"]
                 raise ApiAuthorizationError(
@@ -1196,7 +1201,7 @@ class NativeApi(Api):
             url = "{0}/dataverses/{1}/datasets".format(
                 self.base_url_api_native, dataverse
             )
-        resp = self.post_request(url, metadata, auth)
+        resp = self.post_request(url, metadata, auth, contentType="application/json")
 
         if resp.status_code == 404:
             error_msg = resp.json()["message"]
@@ -1639,7 +1644,7 @@ class NativeApi(Api):
             # CHECK: Its not really clear, if the version query can also be done via ID.
         return self.get_request(url, auth=auth)
 
-    def upload_datafile(self, identifier, filename, json_str=None, is_pid=True):
+    def upload_datafile(self, identifier, filename, json_str=None, is_pid=True, content_type='application/json'):
         """Add file to a dataset.
 
         Add a file to an existing Dataset. Description and tags are optional:
@@ -1666,6 +1671,9 @@ class NativeApi(Api):
             Metadata as JSON string.
         is_pid : bool
             ``True`` to use persistent identifier. ``False``, if not.
+        content_type : str
+            MIME type. Defaults to ``application/octet-stream``; this will prompt Dataverse to attempt to identify the MIME type of the file more accurately. 
+
 
         Returns
         -------
