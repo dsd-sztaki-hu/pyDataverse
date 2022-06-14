@@ -171,7 +171,7 @@ class Api:
             params["key"] = self.api_token
 
         if contentType:
-                kwargs = {"headers": {"content-type": header}}
+                kwargs = {"headers": {"content-type": contentType}}
         else:
                 kwargs = {}
 
