@@ -140,7 +140,7 @@ class Api:
                 "ERROR: GET - Could not establish connection to api {0}.".format(url)
             )
 
-    def post_request(self, url, data=None, auth=False, params=None, files=None, contentType=None):
+    def post_request(self, url, data=None, auth=False, params=None, files=None, content_type=None):
         """Make a POST request.
 
         params will be added as key-value pairs to the URL.
@@ -158,6 +158,9 @@ class Api:
         params : dict
             Dictionary of parameters to be passed with the request.
             Defaults to `None`.
+        content_type : str
+            Content-type to send the POST with
+            Defaults to `None`.
 
         Returns
         -------
@@ -170,8 +173,8 @@ class Api:
         if self.api_token:
             params["key"] = self.api_token
 
-        if contentType:
-                kwargs = {"headers": {"content-type": contentType}}
+        if content_type:
+                kwargs = {"headers": {"content-type": content_type}}
         else:
                 kwargs = {}
 
@@ -1201,7 +1204,7 @@ class NativeApi(Api):
             url = "{0}/dataverses/{1}/datasets".format(
                 self.base_url_api_native, dataverse
             )
-        resp = self.post_request(url, metadata, auth, contentType="application/json")
+        resp = self.post_request(url, metadata, auth, content_type="application/json")
 
         if resp.status_code == 404:
             error_msg = resp.json()["message"]
@@ -1644,7 +1647,7 @@ class NativeApi(Api):
             # CHECK: Its not really clear, if the version query can also be done via ID.
         return self.get_request(url, auth=auth)
 
-    def upload_datafile(self, identifier, filename, json_str=None, is_pid=True, content_type='application/json'):
+    def upload_datafile(self, identifier, filename, json_str=None, is_pid=True):
         """Add file to a dataset.
 
         Add a file to an existing Dataset. Description and tags are optional:
@@ -1671,9 +1674,6 @@ class NativeApi(Api):
             Metadata as JSON string.
         is_pid : bool
             ``True`` to use persistent identifier. ``False``, if not.
-        content_type : str
-            MIME type. Defaults to ``application/octet-stream``; this will prompt Dataverse to attempt to identify the MIME type of the file more accurately. 
-
 
         Returns
         -------
