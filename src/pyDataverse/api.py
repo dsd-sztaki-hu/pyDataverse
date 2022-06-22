@@ -1293,11 +1293,11 @@ class NativeApi(Api):
 
         """
         if is_pid:
-            url = "{0}/datasets/:persistentId/"+action+"Metadata/?persistentId={1}".format(
+            url = ("{0}/datasets/:persistentId/"+action+"Metadata/?persistentId={1}").format(
                 self.base_url_api_native, identifier
             )
         else:
-            url = "{0}/datasets/"+action+"Metadata/{1}".format(
+            url = ("{0}/datasets/"+action+"Metadata/{1}").format(
                 self.base_url_api_native, identifier
             )
         params = {"replace": "true"} if replace else {}
