@@ -1231,18 +1231,20 @@ class NativeApi(Api):
                     print("ERROR: No identifier returned for created Dataset.")
         return resp
 
-    def edit_dataset_metadata(
-        self, identifier, metadata, is_pid=True, replace=False, auth=True
+    def edit_or_delete_dataset_metadata(
+        self, identifier, metadata, is_pid=True, replace=False, auth=True, action="edit"
     ):
-        """Edit metadata of a given dataset.
+        """Edit or delete metadata of/from a given dataset.
 
         `edit-dataset-metadata <http://guides.dataverse.org/en/latest/api/native-api.html#edit-dataset-metadata>`_.
+        `delete-dataset-metadata <http://guides.dataverse.org/en/latest/api/native-api.html#edit-dataset-metadata>`_.
 
         HTTP Request:
 
         .. code-block:: bash
 
             PUT http://$SERVER/api/datasets/editMetadata/$id --upload-file FILENAME
+            PUT http://$SERVER/api/datasets/deleteMetadata/$id --upload-file FILENAME
 
         Add data to dataset fields that are blank or accept multiple values with
         the following
@@ -1254,7 +1256,7 @@ class NativeApi(Api):
             curl -H "X-Dataverse-key: $API_TOKEN" -X PUT $SERVER_URL/api/datasets/:persistentId/editMetadata/?persistentId=$pid --upload-file dataset-add-metadata.json
 
         For these edits your JSON file need only include those dataset fields
-        which you would like to edit. A sample JSON file may be downloaded
+        which you would like to edit/delete. A sample JSON file may be downloaded
         here: `dataset-edit-metadata-sample.json
         <http://guides.dataverse.org/en/latest/_downloads/dataset-finch1.json>`_
 
@@ -1267,10 +1269,13 @@ class NativeApi(Api):
             Metadata of the Dataset as a json-formatted string.
         is_pid : bool
             ``True`` to use persistent identifier. ``False``, if not.
+            The 5.10 API documentation seems to have no indictation that the one with id_pid=false should work at all...
         replace : bool
             ``True`` to replace already existing metadata. ``False``, if not.
         auth : bool
             ``True``, if an api token should be sent. Defaults to ``False``.
+        action : str
+            "edit" or "delete"
 
         Returns
         -------
@@ -1288,11 +1293,11 @@ class NativeApi(Api):
 
         """
         if is_pid:
-            url = "{0}/datasets/:persistentId/editMetadata/?persistentId={1}".format(
+            url = "{0}/datasets/:persistentId/"+action+"Metadata/?persistentId={1}".format(
                 self.base_url_api_native, identifier
             )
         else:
-            url = "{0}/datasets/editMetadata/{1}".format(
+            url = "{0}/datasets/"+action+"Metadata/{1}".format(
                 self.base_url_api_native, identifier
             )
         params = {"replace": "true"} if replace else {}
@@ -1316,6 +1321,28 @@ class NativeApi(Api):
         elif resp.status_code == 200:
             print("Dataset '{0}' updated".format(identifier))
         return resp
+
+    def edit_dataset_metadata(
+        self, identifier, metadata, is_pid=True, replace=False, auth=True
+    ):
+        """Edit metadata of a given dataset.
+
+        `edit-dataset-metadata <http://guides.dataverse.org/en/latest/api/native-api.html#edit-dataset-metadata>`_.
+        
+        See parameters and examples at edit_or_delete_dataset_metadata().
+        """ 
+        edit_or_delete_dataset_metadata(identifier, metadata, is_pid=True, replace=False, auth=True, action="edit")
+
+    def delete_dataset_metadata(
+        self, identifier, metadata, is_pid=True, replace=False, auth=True
+    ):
+        """Delete metadata from a given dataset.
+
+        `delete-dataset-metadata <http://guides.dataverse.org/en/latest/api/native-api.html#edit-dataset-metadata>`_.
+        
+        See parameters and examples at edit_or_delete_dataset_metadata().
+        """ 
+        edit_or_delete_dataset_metadata(identifier, metadata, is_pid=True, replace=False, auth=True, action="delete")
 
     def create_dataset_private_url(self, identifier, is_pid=True, auth=True):
         """Create private Dataset URL.
