@@ -1331,7 +1331,7 @@ class NativeApi(Api):
         
         See parameters and examples at edit_or_delete_dataset_metadata().
         """ 
-        return self.edit_or_delete_dataset_metadata(identifier, metadata, is_pid=True, replace=False, auth=True, action="edit")
+        return self.edit_or_delete_dataset_metadata(identifier, metadata, is_pid=is_pid, replace=replace, auth=auth, action="edit")
 
     def delete_dataset_metadata(
         self, identifier, metadata, is_pid=True, replace=False, auth=True
@@ -1342,7 +1342,7 @@ class NativeApi(Api):
         
         See parameters and examples at edit_or_delete_dataset_metadata().
         """ 
-        return self.edit_or_delete_dataset_metadata(identifier, metadata, is_pid=True, replace=False, auth=True, action="delete")
+        return self.edit_or_delete_dataset_metadata(identifier, metadata, is_pid=is_pid, replace=replace, auth=auth, action="delete")
 
     def create_dataset_private_url(self, identifier, is_pid=True, auth=True):
         """Create private Dataset URL.
